@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# Pimo Player
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A pixel-perfect, YouTube-inspired video player for React and TypeScript. Pimo is designed to be lightweight, highly customizable, and visually stunning with built-in glassmorphism effects and modern controls.
 
-Currently, two official plugins are available:
+![Pimo Player Demo](https://raw.githubusercontent.com/rajanprajapati1/pimo-player/refs/heads/main/public/demo.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- 🎨 **YouTube Aesthetics**: Pixel-perfect replica of the YouTube UI.
+- 🧪 **Glassmorphism**: Modern glass effects on overlays and big play button.
+- 📱 **Fully Responsive**: Works seamlessly across all screen sizes.
+- ⌨️ **Keyboard Shortcuts**: Familiar controls (Space for play/pause, J/K/L for seeking, etc.).
+- 🛠️ **Customizable**: Easy to theme and extend with your own logic.
+- 📦 **Lightweight**: Zero heavy dependencies, optimized for performance.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Installation
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Documentation for installation coming soon
+npm install pimo-player
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Quick Start
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```tsx
+import { VideoPlayer } from 'pimo-player';
+import 'pimo-player/dist/index.css';
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+const App = () => {
+  return (
+    <div className="container">
+      <VideoPlayer 
+        src="https://example.com/video.mp4"
+        poster="https://example.com/poster.jpg"
+        theme="dark"
+      />
+    </div>
+  );
+};
 ```
+
+## License
+
+MIT © [Rajan Prajapati](https://github.com/rajanprajapati1)
+
