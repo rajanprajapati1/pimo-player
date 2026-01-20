@@ -1,6 +1,6 @@
 {
   "name": "pimo-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A pixel-perfect, YouTube-inspired video player for React and TypeScript with glassmorphism effects and modern controls.",
   "type": "module",
   "main": "./dist/pimo-player.cjs.js",
