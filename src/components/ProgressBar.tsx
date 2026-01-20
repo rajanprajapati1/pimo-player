@@ -77,37 +77,47 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
    onMouseMove={handleMouseMove}
    onMouseDown={handleMouseDown}
    onMouseLeave={handleMouseLeave}
+   data-pimo-progress=""
+   role="slider"
+   aria-label="Video progress"
+   aria-valuemin={0}
+   aria-valuemax={Math.round(duration)}
+   aria-valuenow={Math.round(currentTime)}
   >
    {/* Preview Thumbnail */}
    {hoverTime !== null && (
     <div
      className="ryp-preview-thumbnail"
      style={{ left: hoverPosition }}
+     data-pimo-preview=""
     >
      {previewThumbnail && (
-      <img src={previewThumbnail} alt="Preview" />
+      <img src={previewThumbnail} alt="Preview" data-pimo-preview-image="" />
      )}
-     <div className="ryp-preview-time">{formatTime(hoverTime)}</div>
+     <div className="ryp-preview-time" data-pimo-preview-time="">{formatTime(hoverTime)}</div>
     </div>
    )}
 
-   <div className="ryp-progress-bar">
+   <div className="ryp-progress-bar" data-pimo-progress-bar="">
     {/* Buffered */}
     <div
      className="ryp-progress-buffered"
      style={{ width: `${bufferedPercent}%` }}
+     data-pimo-buffered=""
     />
 
     {/* Played */}
     <div
      className="ryp-progress-played"
      style={{ width: `${playedPercent}%` }}
+     data-pimo-played=""
     />
 
     {/* Handle */}
     <div
      className="ryp-progress-handle"
      style={{ left: `${playedPercent}%` }}
+     data-pimo-handle=""
     />
    </div>
   </div>

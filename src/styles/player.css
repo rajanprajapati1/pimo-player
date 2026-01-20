@@ -17,12 +17,13 @@
 .ryp-player {
   position: relative;
   width: 100%;
+  max-width: 100%;
   background: #000;
   overflow: hidden;
   font-family: var(--ryp-font);
   user-select: none;
   -webkit-user-select: none;
-  aspect-ratio: 16/9;
+  /* aspect-ratio is set dynamically via JS */
   border-radius: 12px;
 }
 
@@ -39,15 +40,16 @@
   width: 100vw;
   height: 100vh;
   border-radius: 0;
+  aspect-ratio: auto !important;
 }
 
-/* Video Element - COVER to fill entire player */
+/* Video Element - Contain for proper aspect ratio */
 .ryp-video {
   width: 100%;
   height: 100%;
   display: block;
   background: #000;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 12px;
 }
 
@@ -75,7 +77,7 @@
   opacity: 1;
 }
 
-/* Controls Wrapper */
+/* Controls Wrapper - INSTANT SHOW/HIDE LIKE YOUTUBE */
 .ryp-controls-wrapper {
   position: absolute;
   bottom: 0;
@@ -84,7 +86,7 @@
   padding: 0 12px 8px;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease, visibility 0s 0.15s;
   z-index: 10;
 }
 
@@ -93,6 +95,7 @@
 .ryp-player:not(.ryp-playing) .ryp-controls-wrapper {
   opacity: 1;
   visibility: visible;
+  transition: opacity 0.15s ease, visibility 0s 0s;
 }
 
 /* Progress Bar */
@@ -112,6 +115,7 @@
   height: 3px;
   background: rgba(255, 255, 255, 0.3);
   transition: height 0.1s ease;
+  border-radius: 40px;
 }
 
 .ryp-progress-container:hover .ryp-progress-bar {
@@ -125,6 +129,7 @@
   height: 100%;
   background: rgba(255, 255, 255, 0.5);
   pointer-events: none;
+  border-radius: 30px;
 }
 
 .ryp-progress-played {
@@ -132,8 +137,9 @@
   top: 0;
   left: 0;
   height: 100%;
-  background: #f00;
+  background: rgb(122, 122, 122);
   z-index: 1;
+  border-radius: 30px;
 }
 
 .ryp-progress-handle {
@@ -142,28 +148,33 @@
   transform: translate(-50%, -50%) scale(0);
   width: 13px;
   height: 13px;
-  background: #f00;
+  background: #303030;
   border-radius: 50%;
   z-index: 2;
   transition: transform 0.1s ease;
+  border-radius: 30px;
 }
 
 .ryp-progress-container:hover .ryp-progress-handle {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* Preview Thumbnail */
+/* Preview Thumbnail - GLASS MORPHISM ROUNDED & CENTERED */
 .ryp-preview-thumbnail {
   position: absolute;
-  bottom: 36px;
+  bottom: 40px;
   transform: translateX(-50%);
-  background: #212121;
-  border-radius: 4px;
-  padding: 4px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  /* Glassmorphism effect */
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 6px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s ease, visibility 0s 0.15s;
   pointer-events: none;
   z-index: 20;
 }
@@ -171,6 +182,7 @@
 .ryp-progress-container:hover .ryp-preview-thumbnail {
   opacity: 1;
   visibility: visible;
+  transition: opacity 0.15s ease, visibility 0s 0s;
 }
 
 .ryp-preview-thumbnail img {
@@ -178,15 +190,16 @@
   width: 160px;
   height: 90px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 .ryp-preview-time {
   text-align: center;
   color: var(--ryp-text-primary);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Controls Row */
@@ -195,6 +208,7 @@
   align-items: center;
   justify-content: space-between;
   height: 36px;
+  margin-bottom: 5px;
 }
 
 .ryp-controls-left,
@@ -263,92 +277,113 @@
 }
 
 /* ========================================
-   VOLUME CONTROL - YOUTUBE PILL STYLE
+   VOLUME CONTROL - YOUTUBE STYLE
+   Slider collapses when not hovered, expands on hover
    ======================================== */
 .ryp-volume-container {
   display: flex;
   align-items: center;
   gap: 0;
-  /* Pill-shaped container like YouTube */
+  /* Same background as other control buttons */
   background: rgba(255, 255, 255, 0.1);
   border-radius: 24px;
-  padding: 0 4px 0 0;
-  transition: background 0.15s ease;
+  padding: 0;
+  transition: background 0.15s ease, padding 0.2s ease;
 }
 
 .ryp-volume-container:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  padding-right: 10px;
 }
 
 /* Volume button inside the pill */
 .ryp-volume-container .ryp-btn {
   background: transparent;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  flex-shrink: 0;
 }
 
 .ryp-volume-container .ryp-btn:hover {
   background: transparent;
 }
 
+/* Slider wrapper - collapsed by default, expands on hover */
 .ryp-volume-slider-wrapper {
-  width: 60px;
+  width: 0;
   overflow: hidden;
-  transition: width 0.2s ease;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
 }
 
+.ryp-volume-container:hover .ryp-volume-slider-wrapper {
+  width: 56px;
+}
+
+/* Volume Slider Track - Dark background */
 .ryp-volume-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 52px;
-  height: 4px;
+  width: 48px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
-  margin: 0 8px 0 0;
+  margin: 0;
+  position: relative;
 }
 
+/* Slider Thumb - Small white circle */
 .ryp-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   background: #fff;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.ryp-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 .ryp-volume-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   background: #fff;
   border: none;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-/* Settings Menu */
+/* Settings Menu - GLASS MORPHISM */
 .ryp-settings-menu {
   position: absolute;
   bottom: 56px;
   right: 12px;
-  background: var(--ryp-menu-bg);
+  /* Glassmorphism effect */
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   min-width: 250px;
   max-height: 400px;
   overflow-y: auto;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 2px 12px rgba(0, 0, 0, 0.3);
   z-index: 30;
   opacity: 0;
   visibility: hidden;
   transform: scale(0.95) translateY(8px);
   transform-origin: bottom right;
-  transition: all 0.12s ease;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ryp-settings-menu.ryp-open {
@@ -483,19 +518,23 @@
   fill: var(--ryp-text-primary);
 }
 
-/* Context Menu */
+/* Context Menu - GLASS MORPHISM COMPACT */
 .ryp-context-menu {
   position: fixed;
-  background: var(--ryp-menu-bg);
-  border-radius: 12px;
-  min-width: 220px;
-  padding: 8px 0;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  /* Glassmorphism effect */
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  min-width: 180px;
+  padding: 4px 0;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 100;
   opacity: 0;
   visibility: hidden;
   transform: scale(0.92);
-  transition: all 0.1s ease-out;
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ryp-context-menu.ryp-open {
@@ -507,37 +546,38 @@
 .ryp-context-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 10px 16px;
+  gap: 10px;
+  padding: 7px 12px;
   cursor: pointer;
   transition: background 0.1s ease;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--ryp-text-primary);
 }
 
 .ryp-context-item:first-child {
-  border-radius: 8px 8px 0 0;
+  border-radius: 6px 6px 0 0;
 }
 
 .ryp-context-item:last-child {
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 6px 6px;
 }
 
 .ryp-context-item:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .ryp-context-item svg {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   fill: var(--ryp-text-primary);
   flex-shrink: 0;
+  opacity: 0.9;
 }
 
 .ryp-context-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0;
 }
 
 /* Playlist Panel */

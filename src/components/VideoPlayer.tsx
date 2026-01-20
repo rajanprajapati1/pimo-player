@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import type { VideoPlayerProps, PlaylistItem } from '../types';
+import type { VideoPlayerProps } from '../types';
 import { DEFAULT_QUALITIES } from '../types';
 import { useVideoPlayer } from '../hooks/useVideoPlayer';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -9,7 +9,6 @@ import { ProgressBar } from './ProgressBar';
 import { VolumeControl } from './VolumeControl';
 import { SettingsMenu } from './SettingsMenu';
 import { ContextMenu } from './ContextMenu';
-import { PlaylistPanel } from './PlaylistPanel';
 import '../styles/player.css';
 
 // Icons - YouTube exact style
@@ -64,7 +63,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   className = '',
   width = '100%',
   height = 'auto',
+  aspectRatio = '16:9',
   controls = true,
+  playsInline = true,
   onTimeUpdate,
   onEnded,
   onPlay,
@@ -80,12 +81,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   // State
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [playlistOpen, setPlaylistOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState({ isOpen: false, x: 0, y: 0 });
   const [isLooping, setIsLooping] = useState(loop);
   const [ambientMode, setAmbientMode] = useState(false);
   const [quality, setQuality] = useState(qualities[0]);
-  const [playlistAutoPlay, setPlaylistAutoPlay] = useState(true);
   const [controlsVisible, setControlsVisible] = useState(true);
   const controlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -149,17 +148,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (player.isEnded) {
       onEnded?.();
       // Auto-play next in playlist
-      if (playlist.length > 0 && playlistAutoPlay && currentIndex < playlist.length - 1) {
+      if (playlist.length > 0 && currentIndex < playlist.length - 1) {
         setCurrentIndex(prev => prev + 1);
       }
     }
-  }, [player.isEnded, onEnded, playlist.length, playlistAutoPlay, currentIndex]);
+  }, [player.isEnded, onEnded, playlist.length, currentIndex]);
 
   useEffect(() => {
     if (player.playing) {
       onPlay?.();
+    } else if (!player.playing && player.currentTime > 0) {
+      onPause?.();
     }
-  }, [player.playing, onPlay]);
+  }, [player.playing, player.currentTime, onPlay, onPause]);
 
   useEffect(() => {
     onVolumeChange?.(player.volume, player.muted);
@@ -217,10 +218,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     onQualityChange?.(q);
   };
 
-  const handlePlaylistItemClick = (index: number) => {
-    setCurrentIndex(index);
-    setTimeout(() => player.play(), 100);
-  };
+
 
   const handleNextVideoClick = () => {
     if (nextVideo) {
@@ -247,14 +245,27 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     className,
   ].filter(Boolean).join(' ');
 
+  // Convert aspect ratio from "16:9" format to CSS-compatible "16/9" format
+  const cssAspectRatio = aspectRatio === 'auto' ? 'auto' : aspectRatio.replace(':', '/');
+
   return (
     <div
       ref={containerRef}
       className={playerClasses}
-      style={{ width, height: typeof height === 'number' ? `${height}px` : height }}
+      style={{
+        width,
+        height: typeof height === 'number' ? `${height}px` : height,
+        aspectRatio: cssAspectRatio,
+      }}
       onMouseMove={resetControlsTimer}
       onContextMenu={handleContextMenu}
       tabIndex={0}
+      role="application"
+      aria-label="Video Player"
+      data-pimo-player=""
+      data-pimo-state={player.playing ? 'playing' : player.isEnded ? 'ended' : 'paused'}
+      data-pimo-fullscreen={isFullscreen}
+      data-pimo-muted={player.muted}
     >
       {/* Video Element */}
       <video
@@ -265,35 +276,47 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         loop={isLooping}
         muted={initialMuted}
         autoPlay={autoPlay}
-        playsInline
+        playsInline={playsInline}
         onClick={() => {
           setContextMenu({ isOpen: false, x: 0, y: 0 });
           player.togglePlay();
         }}
         onDoubleClick={handleDoubleClick}
+        data-pimo-video=""
+        aria-label="Video"
       />
 
       {/* Gradient Overlay */}
-      <div className="ryp-gradient-overlay" />
+      <div className="ryp-gradient-overlay" data-pimo-gradient="" />
 
       {/* Loading Spinner */}
       {player.isLoading && !player.isEnded && (
-        <div className="ryp-loading">
-          <div className="ryp-spinner" />
+        <div className="ryp-loading" data-pimo-loading="" role="status" aria-label="Loading video">
+          <div className="ryp-spinner" data-pimo-spinner="" />
         </div>
       )}
 
       {/* Big Play Button */}
       {!player.playing && !player.isLoading && !player.isEnded && (
-        <button className="ryp-big-play" onClick={player.play}>
+        <button
+          className="ryp-big-play"
+          onClick={player.play}
+          data-pimo-big-play=""
+          aria-label="Play video"
+        >
           <PlayIcon />
         </button>
       )}
 
       {/* Ended Overlay */}
       {player.isEnded && (
-        <div className="ryp-ended-overlay">
-          <button className="ryp-replay-btn" onClick={player.replay}>
+        <div className="ryp-ended-overlay" data-pimo-ended-overlay="">
+          <button
+            className="ryp-replay-btn"
+            onClick={player.replay}
+            data-pimo-replay=""
+            aria-label="Replay video"
+          >
             <ReplayIcon />
           </button>
         </div>
@@ -321,7 +344,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
       {/* Controls */}
       {controls && (
-        <div className="ryp-controls-wrapper">
+        <div className="ryp-controls-wrapper" data-pimo-controls="" role="toolbar" aria-label="Video controls">
           {/* Progress Bar */}
           <ProgressBar
             currentTime={player.currentTime}
@@ -336,21 +359,28 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           />
 
           {/* Controls Row */}
-          <div className="ryp-controls-row">
-            <div className="ryp-controls-left">
+          <div className="ryp-controls-row" data-pimo-controls-row="">
+            <div className="ryp-controls-left" data-pimo-controls-left="">
               {/* Previous (if playlist) */}
               {playlist.length > 1 && (
                 <button
                   className="ryp-btn"
                   onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
                   disabled={currentIndex === 0}
+                  data-pimo-prev=""
+                  aria-label="Previous video"
                 >
                   <SkipPrevIcon />
                 </button>
               )}
 
               {/* Play/Pause */}
-              <button className="ryp-btn" onClick={player.togglePlay}>
+              <button
+                className="ryp-btn"
+                onClick={player.togglePlay}
+                data-pimo-play-pause=""
+                aria-label={player.playing ? 'Pause' : 'Play'}
+              >
                 {player.playing ? <PauseIcon /> : <PlayIcon />}
               </button>
 
@@ -360,6 +390,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   className="ryp-btn"
                   onClick={() => setCurrentIndex(Math.min(playlist.length - 1, currentIndex + 1))}
                   disabled={currentIndex === playlist.length - 1}
+                  data-pimo-next=""
+                  aria-label="Next video"
                 >
                   <SkipNextIcon />
                 </button>
@@ -374,29 +406,42 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               />
 
               {/* Time */}
-              <div className="ryp-time">
-                <span className="ryp-time-current">{formatTime(player.currentTime)}</span>
-                <span className="ryp-time-separator">/</span>
-                <span>{formatTime(player.duration)}</span>
+              <div className="ryp-time" data-pimo-time="" aria-label={`${formatTime(player.currentTime)} of ${formatTime(player.duration)}`}>
+                <span className="ryp-time-current" data-pimo-time-current="">{formatTime(player.currentTime)}</span>
+                <span className="ryp-time-separator" data-pimo-time-separator="">/</span>
+                <span className="ryp-time-duration" data-pimo-time-duration="">{formatTime(player.duration)}</span>
               </div>
             </div>
 
-            <div className="ryp-controls-right">
+            <div className="ryp-controls-right" data-pimo-controls-right="">
               {/* Settings */}
               <button
                 className="ryp-btn"
                 onClick={() => setSettingsOpen(!settingsOpen)}
+                data-pimo-settings=""
+                aria-label="Settings"
+                aria-expanded={settingsOpen}
               >
                 <SettingsIcon />
               </button>
 
               {/* Mini Player */}
-              <button className="ryp-btn" onClick={handlePictureInPicture}>
+              <button
+                className="ryp-btn"
+                onClick={handlePictureInPicture}
+                data-pimo-pip=""
+                aria-label="Picture in picture"
+              >
                 <MiniPlayerIcon />
               </button>
 
               {/* Fullscreen */}
-              <button className="ryp-btn" onClick={toggleFullscreen}>
+              <button
+                className="ryp-btn"
+                onClick={toggleFullscreen}
+                data-pimo-fullscreen=""
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              >
                 {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
               </button>
             </div>
@@ -430,17 +475,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onCopyUrlAtTime={handleCopyUrlAtTime}
         onCopyEmbedCode={handleCopyEmbedCode}
         onPictureInPicture={handlePictureInPicture}
-      />
-
-      {/* Playlist Panel */}
-      <PlaylistPanel
-        isOpen={playlistOpen}
-        onClose={() => setPlaylistOpen(false)}
-        items={playlist}
-        currentIndex={currentIndex}
-        onItemClick={handlePlaylistItemClick}
-        autoPlay={playlistAutoPlay}
-        onAutoPlayChange={setPlaylistAutoPlay}
       />
     </div>
   );

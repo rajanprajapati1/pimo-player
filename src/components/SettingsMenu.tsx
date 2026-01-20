@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PLAYBACK_SPEEDS } from '../types';
 import type { PlaybackSpeed } from '../types';
 
@@ -26,12 +26,6 @@ const BackIcon = () => (
 const SpeedIcon = () => (
  <svg viewBox="0 0 24 24">
   <path d="M10 8v8l6-4-6-4zm6.76-2.76L18 4v5h-2V5.82l-.74.74C13.9 7.9 12.5 8.5 11 8.5s-2.9-.6-4.26-1.94L6 5.82V9H4V4h5v2H5.82l.74.74C7.9 8.1 9.5 9 11 9s3.1-.9 4.26-2.24l.5-.52zM18 20h-5v-2h3.18l-.74-.74C14.1 15.9 12.5 15.3 11 15.5s-2.9.6-4.26 1.94L6 18.18V15H4v5h5v-2H5.82l.74-.74C7.9 15.9 9.5 15 11 15s3.1.9 4.26 2.24l.5.52V15h2v5z" />
- </svg>
-);
-
-const QualityIcon = () => (
- <svg viewBox="0 0 24 24">
-  <path d="M15.5 7.5v9H14V12h-4v4.5H8.5v-9H10V11h4V7.5h1.5zm4-1v11c0 .55-.45 1-1 1H5.5c-.55 0-1-.45-1-1v-11c0-.55.45-1 1-1h13c.55 0 1 .45 1 1zm1.5 0c0-1.38-1.12-2.5-2.5-2.5H5.5C4.12 4 3 5.12 3 6.5v11C3 18.88 4.12 20 5.5 20h13c1.38 0 2.5-1.12 2.5-2.5v-11z" />
  </svg>
 );
 
@@ -75,6 +69,37 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
  onLoopChange,
 }) => {
  const [view, setView] = useState<SettingsView>('main');
+ const menuRef = useRef<HTMLDivElement>(null);
+
+ // Close on click outside or Escape key
+ useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+   if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+    onClose();
+    setView('main');
+   }
+  };
+
+  const handleEscape = (e: KeyboardEvent) => {
+   if (e.key === 'Escape') {
+    onClose();
+    setView('main');
+   }
+  };
+
+  if (isOpen) {
+   // Use setTimeout to avoid closing immediately when opening
+   setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+   }, 0);
+   document.addEventListener('keydown', handleEscape);
+  }
+
+  return () => {
+   document.removeEventListener('click', handleClickOutside);
+   document.removeEventListener('keydown', handleEscape);
+  };
+ }, [isOpen, onClose]);
 
  const handleSpeedClick = (speed: PlaybackSpeed) => {
   onSpeedChange(speed);
@@ -119,7 +144,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
    </div>
 
    {/* Quality */}
-   <div className="ryp-settings-item" onClick={() => setView('quality')}>
+   {/* <div className="ryp-settings-item" onClick={() => setView('quality')}>
     <div className="ryp-settings-item-left">
      <QualityIcon />
      <span className="ryp-settings-item-label">Quality</span>
@@ -128,7 +153,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
      {quality}
      <ChevronRightIcon />
     </div>
-   </div>
+   </div> */}
   </>
  );
 
@@ -177,7 +202,7 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({
  if (!isOpen) return null;
 
  return (
-  <div className={`ryp-settings-menu ${isOpen ? 'ryp-open' : ''}`}>
+  <div ref={menuRef} className={`ryp-settings-menu ${isOpen ? 'ryp-open' : ''}`}>
    {view === 'main' && renderMainView()}
    {view === 'speed' && renderSpeedView()}
    {view === 'quality' && renderQualityView()}

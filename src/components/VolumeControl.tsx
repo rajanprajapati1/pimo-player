@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, {  useCallback } from 'react';
 
 interface VolumeControlProps {
  volume: number;
@@ -26,21 +26,13 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
  onVolumeChange,
  onMuteToggle,
 }) => {
- const [previousVolume, setPreviousVolume] = useState(volume);
-
  const handleMuteClick = useCallback(() => {
-  if (!muted && volume > 0) {
-   setPreviousVolume(volume);
-  }
   onMuteToggle();
- }, [muted, volume, onMuteToggle]);
+ }, [onMuteToggle]);
 
  const handleSliderChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
   const newVolume = parseFloat(e.target.value);
   onVolumeChange(newVolume);
-  if (newVolume > 0) {
-   setPreviousVolume(newVolume);
-  }
  }, [onVolumeChange]);
 
  const getVolumeIcon = () => {
@@ -50,15 +42,16 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
  };
 
  return (
-  <div className="ryp-volume-container">
+  <div className="ryp-volume-container" data-pimo-volume="">
    <button
     className="ryp-btn"
     onClick={handleMuteClick}
     aria-label={muted ? 'Unmute' : 'Mute'}
+    data-pimo-mute=""
    >
     {getVolumeIcon()}
    </button>
-   <div className="ryp-volume-slider-wrapper">
+   <div className="ryp-volume-slider-wrapper" data-pimo-volume-slider-wrapper="">
     <input
      type="range"
      className="ryp-volume-slider"
@@ -71,6 +64,10 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
       background: `linear-gradient(to right, #fff ${(muted ? 0 : volume) * 100}%, rgba(255,255,255,0.3) ${(muted ? 0 : volume) * 100}%)`,
      }}
      aria-label="Volume"
+     aria-valuemin={0}
+     aria-valuemax={100}
+     aria-valuenow={Math.round((muted ? 0 : volume) * 100)}
+     data-pimo-volume-slider=""
     />
    </div>
   </div>

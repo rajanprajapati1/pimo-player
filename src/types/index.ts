@@ -44,8 +44,22 @@ export interface VideoPlayerProps {
  width?: string | number;
  /** Height of player */
  height?: string | number;
+ /** 
+  * Aspect ratio of the player. Supports:
+  * - '16:9' (YouTube, standard)
+  * - '9:16' (TikTok, Instagram Reels, vertical)
+  * - '1:1' (Instagram square)
+  * - '4:5' (Instagram portrait)
+  * - '4:3' (Traditional TV)
+  * - '21:9' (Ultrawide/Cinema)
+  * - 'auto' (Natural video aspect ratio)
+  * - Custom string like '3:2'
+  */
+ aspectRatio?: '16:9' | '9:16' | '1:1' | '4:5' | '4:3' | '21:9' | 'auto' | string;
  /** Show controls */
  controls?: boolean;
+ /** Play inline on mobile (prevents fullscreen on iOS) */
+ playsInline?: boolean;
  /** Control visibility options */
  controlsConfig?: ControlsConfig;
  /** Callback when time updates */
