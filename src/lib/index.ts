@@ -1,3 +1,6 @@
+// Import styles so they are bundled with the library
+import '../styles/player.css';
+
 // Main exports
 export { VideoPlayer } from '../components/VideoPlayer';
 export { ProgressBar } from '../components/ProgressBar';

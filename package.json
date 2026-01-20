@@ -1,17 +1,63 @@
 {
-  "name": "pimo",
-  "private": true,
-  "version": "0.0.0",
+  "name": "pimo-player",
+  "version": "1.0.0",
+  "description": "A pixel-perfect, YouTube-inspired video player for React and TypeScript with glassmorphism effects and modern controls.",
   "type": "module",
+  "main": "./dist/pimo-player.cjs.js",
+  "module": "./dist/pimo-player.es.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/pimo-player.es.js",
+      "require": "./dist/pimo-player.cjs.js",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:lib": "tsc --project tsconfig.lib.json && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build:lib",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
   },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+  "keywords": [
+    "react",
+    "video",
+    "player",
+    "youtube",
+    "pimo",
+    "typescript",
+    "glassmorphism",
+    "video-player",
+    "react-player",
+    "media-player"
+  ],
+  "author": "Rajan Prajapati",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rajanprajapati1/pimo-player.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rajanprajapati1/pimo-player/issues"
+  },
+  "homepage": "https://github.com/rajanprajapati1/pimo-player#readme",
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
